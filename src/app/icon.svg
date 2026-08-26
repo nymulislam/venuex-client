@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="vx-emerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#065F46" />
+    </linearGradient>
+    <linearGradient id="vx-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+  </defs>
+  <rect x="12" y="18" width="76" height="64" rx="32" stroke="url(#vx-emerald)" stroke-width="7" fill="none" />
+  <path d="M 28 36 L 50 70 L 58 57" stroke="url(#vx-emerald)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 72 36 L 42 70" stroke="url(#vx-gold)" stroke-width="7" stroke-linecap="round" />
+  <circle cx="50" cy="50" r="4" fill="url(#vx-gold)" />
+</svg>

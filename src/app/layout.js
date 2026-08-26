@@ -3,8 +3,11 @@ import "./globals.css";
 import Footer from "@/components/shared/Footer";
 
 export const metadata = {
-  title: "VenueX",
-  description: "Sports Facility Booking System",
+  title: "VenueX | Sports Facility Booking System",
+  description: "Book turfs, badminton courts, and sports venues with ease.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({ children }) {
