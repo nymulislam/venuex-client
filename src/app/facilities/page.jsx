@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaSearch, FaMapMarkerAlt, FaUsers, FaClock, FaFilter, FaUndo } from "react-icons/fa";
 
@@ -9,38 +9,42 @@ const categories = ["All", "Football", "Badminton", "Swimming", "Tennis", "Crick
 export default function AllFacilitiesPage() {
   const [facilities, setFacilities] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Search & Filter States
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // ব্যাকএন্ড API থেকে সব ডাটা লোড
-  useEffect(() => {
-    fetch("http://localhost:5000/facilities")
-      .then((res) => res.json())
-      .then((data) => {
-        setFacilities(data);
-        setLoading(false);
-      })
-      .catch((err) => console.error("Fetch error:", err));
-  }, []);
 
-  // Filter facilities dynamically based on Search & Category
-  const filteredFacilities = useMemo(() => {
-    return facilities.filter((item) => {
-      const matchesSearch = item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            item.location?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === "All" || item.facility_type === selectedCategory;
-      return matchesSearch && matchesCategory;
-    });
-  }, [facilities, searchTerm, selectedCategory]);
+  useEffect(() => {
+    // Debouncing: Call API after 500ms when user typed
+    const delayDebounceFn = setTimeout(() => {
+      setLoading(true);
+      
+      // Query Parameters
+      const params = new URLSearchParams();
+      if (searchTerm) params.append("search", searchTerm);
+      if (selectedCategory !== "All") params.append("category", selectedCategory);
+
+      fetch(`https://venuex-server.vercel.app/facilities?${params.toString()}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setFacilities(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Fetch error:", err);
+          setLoading(false);
+        });
+    }, 500);
+
+    // CleanUP Function
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, selectedCategory]);
 
   const handleReset = () => {
     setSearchTerm("");
     setSelectedCategory("All");
   };
-
-  if (loading) {
-    return <div className="text-center py-20 text-[#065F46] font-bold">Loading All Facilities...</div>;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50/50 py-10">
@@ -68,7 +72,7 @@ export default function AllFacilitiesPage() {
               <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search by facility name or location..."
+                placeholder="Search by facility name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2.5 bg-gray-50 rounded-xl text-sm border border-gray-200 focus:outline-none focus:border-[#065F46] focus:bg-white text-gray-800 transition-all"
@@ -129,10 +133,14 @@ export default function AllFacilitiesPage() {
           )}
         </div>
 
-        {/* Facilities Grid */}
-        {filteredFacilities.length > 0 ? (
+        {/* Loading State or Facilities Grid */}
+        {loading ? (
+           <div className="text-center py-20 text-[#065F46] font-bold">
+             <span className="loading loading-spinner loading-lg text-[#065F46]"></span>
+           </div>
+        ) : facilities.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredFacilities.map((item) => (
+            {facilities.map((item) => (
               <div
                 key={item._id}
                 className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"

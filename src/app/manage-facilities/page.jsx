@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import Swal from "sweetalert2";
 import { FaArrowLeft, FaEdit, FaTrashAlt, FaPlus, FaTimes, FaLayerGroup } from "react-icons/fa";
 
 export default function ManageFacilitiesPage() {
@@ -19,7 +21,7 @@ export default function ManageFacilitiesPage() {
 
         const fetchFacilities = async () => {
             try {
-                const res = await fetch("http://localhost:5000/facilities");
+                const res = await fetch("https://venuex-server.vercel.app/facilities");
                 if (!res.ok) throw new Error("Failed to fetch facilities");
                 const data = await res.json();
                 if (isMounted) {
@@ -41,29 +43,38 @@ export default function ManageFacilitiesPage() {
         };
     }, []);
 
-    // Handle Delete Facility
+    // Handle Delete Facility with SweetAlert2
     const handleDelete = async (id) => {
-        const confirmed = window.confirm("Are you sure you want to delete this facility?");
-        if (!confirmed) return;
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#065F46",
+            confirmButtonText: "Yes, delete it!"
+        });
+
+        if (!result.isConfirmed) return;
 
         setDeletingId(id);
 
         try {
-            const res = await fetch(`http://localhost:5000/facilities/${id}`, {
+            const res = await fetch(`https://venuex-server.vercel.app/facilities/${id}`, {
                 method: "DELETE",
             });
 
             const data = await res.json();
 
             if (data.success) {
-                alert("Facility deleted successfully!");
+                Swal.fire("Deleted!", "Facility has been deleted successfully.", "success");
                 setFacilities((prev) => prev.filter((item) => item._id !== id));
             } else {
-                alert(data.message || "Failed to delete facility.");
+                Swal.fire("Failed!", data.message || "Failed to delete facility.", "error");
             }
         } catch (error) {
             console.error("Delete Error:", error);
-            alert("Something went wrong!");
+            Swal.fire("Error!", "Something went wrong while deleting!", "error");
         } finally {
             setDeletingId(null);
         }
@@ -81,13 +92,13 @@ export default function ManageFacilitiesPage() {
         setEditingFacility((prev) => ({ ...prev, [name]: value }));
     };
 
-    // Submit Edit Form
+    // Submit Edit Form with SweetAlert2
     const handleUpdateSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
 
         try {
-            const res = await fetch(`http://localhost:5000/facilities/${editingFacility._id}`, {
+            const res = await fetch(`https://venuex-server.vercel.app/facilities/${editingFacility._id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(editingFacility),
@@ -96,17 +107,17 @@ export default function ManageFacilitiesPage() {
             const data = await res.json();
 
             if (data.success) {
-                alert("Facility updated successfully!");
+                Swal.fire("Updated!", "Facility updated successfully!", "success");
                 setFacilities((prev) =>
                     prev.map((item) => (item._id === editingFacility._id ? editingFacility : item))
                 );
                 setIsEditModalOpen(false);
             } else {
-                alert(data.message || "Failed to update facility.");
+                Swal.fire("Failed!", data.message || "Failed to update facility.", "error");
             }
         } catch (error) {
             console.error("Update Error:", error);
-            alert("Something went wrong!");
+            Swal.fire("Error!", "Something went wrong while updating!", "error");
         } finally {
             setSubmitting(false);
         }

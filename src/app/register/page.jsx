@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FaUser, FaEnvelope, FaImage, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,15 +26,21 @@ export default function RegisterPage() {
 
     // Password Validation Rules
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+      const msg = "Password must be at least 6 characters long.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
     if (!/[A-Z]/.test(password)) {
-      setError("Password must contain at least one uppercase letter.");
+      const msg = "Password must contain at least one uppercase letter.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
     if (!/[a-z]/.test(password)) {
-      setError("Password must contain at least one lowercase letter.");
+      const msg = "Password must contain at least one lowercase letter.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -48,13 +55,17 @@ export default function RegisterPage() {
       });
 
       if (res?.error) {
-        setError(res.error.message || "Registration failed. Try again.");
+        const errorMsg = res.error.message || "Registration failed. Try again.";
+        setError(errorMsg);
+        toast.error(errorMsg);
       } else {
-        alert("Registration Successful!");
+        toast.success("Registration Successful!");
         router.push("/login");
       }
     } catch (err) {
-      setError(err?.message || "Registration failed. Try again.");
+      const errorMsg = err?.message || "Registration failed. Try again.";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -67,9 +78,12 @@ export default function RegisterPage() {
         provider: "google",
         callbackURL: "/",
       });
+      // Note: No success toast here because social login usually redirects instantly
     } catch (err) {
       console.error("Google Auth Error:", err);
-      setError("Google sign-in failed.");
+      const errorMsg = "Google sign-in failed.";
+      setError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 

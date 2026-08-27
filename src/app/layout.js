@@ -1,6 +1,7 @@
 import Navbar from "@/components/shared/Navbar";
 import "./globals.css";
 import Footer from "@/components/shared/Footer";
+import { Toaster } from "react-hot-toast";
 
 export const metadata = {
   title: "VenueX | Sports Facility Booking System",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
         <Navbar />
         <main className="grow">{children}</main>
         <Footer />
+        <Toaster />
       </body>
     </html>
   );

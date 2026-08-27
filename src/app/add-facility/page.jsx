@@ -3,20 +3,44 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FaArrowLeft, FaPlusCircle, FaBuilding, FaMapMarkerAlt, FaDollarSign, FaUsers, FaImage, FaFileAlt } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { 
+  FaArrowLeft, 
+  FaPlusCircle, 
+  FaBuilding, 
+  FaMapMarkerAlt, 
+  FaDollarSign, 
+  FaUsers, 
+  FaImage, 
+  FaClock, 
+  FaEnvelope 
+} from "react-icons/fa";
+import { authClient } from "@/lib/auth-client";
 
 export default function AddFacilityPage() {
   const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
   const [submitting, setSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     name: "",
     facility_type: "Football",
     location: "",
     price_per_hour: "",
     capacity: "",
+    available_slots: "",
     image: "",
     description: "",
   });
+
+  const timeSlotsOptions = [
+    "06:00 AM - 09:00 AM",
+    "09:00 AM - 12:00 PM",
+    "12:00 PM - 03:00 PM",
+    "03:00 PM - 06:00 PM",
+    "06:00 PM - 09:00 PM",
+    "09:00 PM - 12:00 AM",
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,26 +49,44 @@ export default function AddFacilityPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const ownerEmail = session?.user?.email;
+
+    if (!ownerEmail) {
+      toast.error("Please login first to add a facility!");
+      return;
+    }
+
+    if (!formData.available_slots) {
+      toast.error("Please select an available time slot!");
+      return;
+    }
+
     setSubmitting(true);
 
+    const submissionData = {
+      ...formData,
+      ownerEmail,
+    };
+
     try {
-      const res = await fetch("http://localhost:5000/facilities", {
+      const res = await fetch("https://venuex-server.vercel.app/facilities", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submissionData),
       });
 
       const data = await res.json();
 
       if (data.success) {
-        alert("Facility added successfully!");
-        router.push("/"); // Redirect to home page after success
+        toast.success("Facility added successfully!");
+        router.push("/");
       } else {
-        alert(data.message || "Failed to add facility.");
+        toast.error(data.message || "Failed to add facility.");
       }
     } catch (error) {
       console.error("Error adding facility:", error);
-      alert("Something went wrong! Make sure your server is running.");
+      toast.error("Connection Error! Make sure your server is running.");
     } finally {
       setSubmitting(false);
     }
@@ -76,6 +118,23 @@ export default function AddFacilityPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             
+            {/* Owner Email (Auto-filled from session) */}
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                Owner Email (Auto-filled)
+              </label>
+              <div className="relative">
+                <FaEnvelope className="absolute left-4 top-3.5 text-gray-400" />
+                <input
+                  type="email"
+                  value={session?.user?.email || ""}
+                  readOnly
+                  placeholder={isPending ? "Loading session..." : "Not logged in"}
+                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 text-sm bg-gray-100 text-gray-600 cursor-not-allowed focus:outline-none"
+                />
+              </div>
+            </div>
+
             {/* Facility Name */}
             <div>
               <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
@@ -105,7 +164,7 @@ export default function AddFacilityPage() {
                   name="facility_type"
                   value={formData.facility_type}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#065F46] focus:ring-1 focus:ring-[#065F46] bg-white"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#065F46] focus:ring-1 focus:ring-[#065F46] bg-white text-gray-700"
                 >
                   <option value="Football">Football</option>
                   <option value="Cricket">Cricket</option>
@@ -176,6 +235,32 @@ export default function AddFacilityPage() {
               </div>
             </div>
 
+            {/* Time Slot Dropdown */}
+            <div>
+              <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                Available Time Slot *
+              </label>
+              <div className="relative">
+                <FaClock className="absolute left-4 top-3.5 text-gray-400" />
+                <select
+                  name="available_slots"
+                  value={formData.available_slots}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#065F46] focus:ring-1 focus:ring-[#065F46] bg-white text-gray-700 cursor-pointer"
+                >
+                  <option value="" disabled>
+                    Select a time slot
+                  </option>
+                  {timeSlotsOptions.map((slot) => (
+                    <option key={slot} value={slot}>
+                      {slot}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             {/* Image URL */}
             <div>
               <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
@@ -219,7 +304,7 @@ export default function AddFacilityPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3.5 bg-[#065F46] hover:bg-[#044e39] text-white font-bold rounded-xl shadow-md transition border-none disabled:opacity-50"
+                className="w-full py-3.5 bg-[#065F46] hover:bg-[#044e39] text-white font-bold rounded-xl shadow-md transition border-none disabled:opacity-50 cursor-pointer"
               >
                 {submitting ? "Adding Facility..." : "Add Facility"}
               </button>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,12 +30,17 @@ export default function LoginPage() {
       });
 
       if (res?.error) {
-        setError(res.error.message || "Invalid credentials. Please try again.");
+        const errorMsg = res.error.message || "Invalid credentials. Please try again.";
+        setError(errorMsg);
+        toast.error(errorMsg);
       } else {
+        toast.success("Login Successful!");
         router.push("/");
       }
     } catch (err) {
-      setError(err?.message || "Login failed. Please try again.");
+      const errorMsg = err?.message || "Login failed. Please try again.";
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -49,7 +55,9 @@ export default function LoginPage() {
       });
     } catch (err) {
       console.error("Google Auth Error:", err);
-      setError("Google sign-in failed. Try again.");
+      const errorMsg = "Google sign-in failed. Try again.";
+      setError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 

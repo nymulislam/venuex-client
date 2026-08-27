@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Swal from "sweetalert2";
 import {
   FaArrowLeft,
   FaCalendarAlt,
@@ -18,13 +19,12 @@ export default function MyBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
 
-  // useEffect-এর ভেতরে ফেচিং লজিক রাখা
   useEffect(() => {
     let isMounted = true;
 
     const fetchBookings = async () => {
       try {
-        const res = await fetch("http://localhost:5000/bookings");
+        const res = await fetch("https://venuex-server.vercel.app/bookings");
         if (!res.ok) throw new Error("Failed to fetch bookings");
         const data = await res.json();
         if (isMounted) {
@@ -46,29 +46,38 @@ export default function MyBookingsPage() {
     };
   }, []);
 
-  // Handle Cancel / Delete Booking
+  // Handle Cancel / Delete Booking with SweetAlert2
   const handleCancelBooking = async (id) => {
-    const confirmed = window.confirm("Are you sure you want to cancel this booking?");
-    if (!confirmed) return;
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You want to cancel this booking?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#065F46",
+      confirmButtonText: "Yes, cancel it!",
+    });
+
+    if (!result.isConfirmed) return;
 
     setDeletingId(id);
 
     try {
-      const res = await fetch(`http://localhost:5000/bookings/${id}`, {
+      const res = await fetch(`https://venuex-server.vercel.app/bookings/${id}`, {
         method: "DELETE",
       });
 
       const data = await res.json();
 
       if (data.success) {
-        alert("Booking cancelled successfully!");
+        Swal.fire("Cancelled!", "Booking cancelled successfully.", "success");
         setBookings((prev) => prev.filter((item) => item._id !== id));
       } else {
-        alert(data.message || "Failed to cancel booking.");
+        Swal.fire("Failed!", data.message || "Failed to cancel booking.", "error");
       }
     } catch (error) {
       console.error("Cancel Booking Error:", error);
-      alert("Something went wrong! Please try again.");
+      Swal.fire("Error!", "Something went wrong! Please try again.", "error");
     } finally {
       setDeletingId(null);
     }
@@ -121,7 +130,7 @@ export default function MyBookingsPage() {
             </p>
             <Link
               href="/"
-              className="mt-6 btn bg-[#065F46] hover:bg-[#044e39] text-white px-6 rounded-xl border-none shadow-md"
+              className="mt-6 inline-block bg-[#065F46] hover:bg-[#044e39] text-white font-semibold px-6 py-3 rounded-xl shadow-md transition"
             >
               Browse Facilities
             </Link>
@@ -193,7 +202,7 @@ export default function MyBookingsPage() {
                   <button
                     onClick={() => handleCancelBooking(item._id)}
                     disabled={deletingId === item._id}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-semibold text-xs rounded-xl transition border border-red-100 disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-semibold text-xs rounded-xl transition border border-red-100 disabled:opacity-50 cursor-pointer"
                   >
                     <FaTrashAlt size={12} />
                     {deletingId === item._id ? "Cancelling..." : "Cancel Booking"}

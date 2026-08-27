@@ -1,12 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { FaMapMarkerAlt, FaUsers, FaClock, FaArrowLeft, FaCheckCircle, FaShieldAlt, FaTimes } from "react-icons/fa";
+import Swal from "sweetalert2";
+import { FaMapMarkerAlt, FaUsers, FaClock, FaArrowLeft, FaTimes } from "react-icons/fa";
+import { authClient } from "@/lib/auth-client"; // আপনার প্রজেক্টের পাথ অনুযায়ী ঠিক করে নিন
 
 export default function FacilityDetailsPage() {
   const { id } = useParams();
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+  
   const [facility, setFacility] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +28,7 @@ export default function FacilityDetailsPage() {
   useEffect(() => {
     if (!id) return;
 
-    fetch(`http://localhost:5000/facilities/${id}`)
+    fetch(`https://venuex-server.vercel.app/facilities/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch facility");
         return res.json();
@@ -43,6 +48,26 @@ export default function FacilityDetailsPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleBookNowClick = () => {
+    if (!session?.user) {
+      Swal.fire({
+        icon: "warning",
+        title: "Unauthorized",
+        text: "Please login first to book a facility!",
+        confirmButtonColor: "#065F46",
+      });
+      return;
+    }
+
+    // সেশন থেকে শুধুমাত্র ইমেইল অটো-সেট করা হলো (নাম খালি রাখা হয়েছে যাতে ইউজার নিজে টাইপ করতে পারে)
+    setFormData((prev) => ({
+      ...prev,
+      userEmail: session.user.email || "",
+    }));
+
+    setIsModalOpen(true);
+  };
+
   const handleBookingSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -59,7 +84,7 @@ export default function FacilityDetailsPage() {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/bookings", {
+      const res = await fetch("https://venuex-server.vercel.app/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingPayload),
@@ -68,15 +93,38 @@ export default function FacilityDetailsPage() {
       const data = await res.json();
 
       if (data.success) {
-        alert("Booking Confirmed Successfully!");
         setIsModalOpen(false);
-        setFormData({ userName: "", userEmail: "", date: "", slot: "10:00 AM - 11:00 AM" });
+        setFormData((prev) => ({
+          ...prev,
+          userName: "",
+          date: "",
+          slot: "10:00 AM - 11:00 AM",
+        }));
+        
+        Swal.fire({
+          title: "Success!",
+          text: "Booking Confirmed Successfully!",
+          icon: "success",
+          confirmButtonColor: "#065F46",
+        }).then(() => {
+          router.push("/my-bookings"); 
+        });
       } else {
-        alert("Booking failed. Please try again.");
+        Swal.fire({
+          title: "Failed!",
+          text: data.message || "Booking failed. Please try again.",
+          icon: "error",
+          confirmButtonColor: "#065F46",
+        });
       }
     } catch (error) {
       console.error("Booking Error:", error);
-      alert("Something went wrong!");
+      Swal.fire({
+        title: "Error!",
+        text: "Something went wrong! Please try again.",
+        icon: "error",
+        confirmButtonColor: "#065F46",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -156,10 +204,10 @@ export default function FacilityDetailsPage() {
               </div>
 
               <button
-                onClick={() => setIsModalOpen(true)}
-                className="btn bg-[#065F46] hover:bg-[#044e39] text-white font-semibold px-8 rounded-xl border-none shadow-md"
+                onClick={handleBookNowClick}
+                className="btn bg-[#065F46] hover:bg-[#044e39] text-white font-semibold px-8 rounded-xl border-none shadow-md cursor-pointer"
               >
-                Book Now
+                {isPending ? "Loading..." : "Book Now"}
               </button>
             </div>
           </div>
@@ -172,7 +220,7 @@ export default function FacilityDetailsPage() {
           <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md relative shadow-2xl">
             <button
               onClick={() => setIsModalOpen(false)}
-              className="absolute top-5 right-5 text-gray-400 hover:text-gray-600"
+              className="absolute top-5 right-5 text-gray-400 hover:text-gray-600 cursor-pointer"
             >
               <FaTimes size={18} />
             </button>
@@ -187,7 +235,7 @@ export default function FacilityDetailsPage() {
                   type="text"
                   name="userName"
                   required
-                  placeholder="Enter full name"
+                  placeholder="Enter your full name"
                   value={formData.userName}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#065F46]"
@@ -195,15 +243,14 @@ export default function FacilityDetailsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">Your Email</label>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Your Email (Auto-filled)</label>
                 <input
                   type="email"
                   name="userEmail"
                   required
-                  placeholder="name@example.com"
+                  readOnly
                   value={formData.userEmail}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-[#065F46]"
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-gray-100 text-gray-600 cursor-not-allowed focus:outline-none"
                 />
               </div>
 
@@ -239,7 +286,7 @@ export default function FacilityDetailsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full py-3 bg-[#065F46] hover:bg-[#044e39] text-white font-semibold rounded-xl transition border-none disabled:opacity-50"
+                  className="w-full py-3 bg-[#065F46] hover:bg-[#044e39] text-white font-semibold rounded-xl transition border-none disabled:opacity-50 cursor-pointer"
                 >
                   {submitting ? "Confirming..." : "Confirm Booking"}
                 </button>
