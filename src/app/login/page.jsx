@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { authClient } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,23 +23,32 @@ export default function LoginPage() {
     const password = form.password.value;
 
     try {
-      // TODO: আপনার Authentication Logic (Better Auth / Custom JWT Auth) এখানে বসাবেন
-      console.log({ email, password });
-      
-      // সফল হলে ড্যাশবোর্ড বা হোমপেজে নেভিগেট করবে
-      router.push("/");
+      const res = await authClient.signIn.email({
+        email,
+        password,
+      });
+
+      if (res?.error) {
+        setError(res.error.message || "Invalid credentials. Please try again.");
+      } else {
+        router.push("/");
+      }
     } catch (err) {
-      setError(err?.message || "Invalid credentials. Please try again.");
+      setError(err?.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
+    setError("");
     try {
-      // TODO: Google Authentication Trigger
-      console.log("Google Login Triggered");
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
     } catch (err) {
+      console.error("Google Auth Error:", err);
       setError("Google sign-in failed. Try again.");
     }
   };
@@ -108,9 +118,9 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn bg-[#065F46] hover:bg-[#044e39] text-white border-none rounded-xl py-3 font-semibold text-sm shadow-md transition-all mt-2"
+            className="w-full btn bg-[#065F46] hover:bg-[#044e39] text-white border-none rounded-xl py-3 font-semibold text-sm shadow-md transition-all mt-2 disabled:opacity-50"
           >
-            {loading ? <span className="loading loading-spinner loading-sm"></span> : "Login"}
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
