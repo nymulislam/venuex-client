@@ -7,6 +7,9 @@ const db = client.db("venuex_db");
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, { client }),
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  trustedOrigins: ["http://localhost:3000"],
   emailAndPassword: {
     enabled: true,
   },
