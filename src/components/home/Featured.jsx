@@ -1,68 +1,28 @@
-// components/home/FeaturedFacilities.jsx
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaMapMarkerAlt, FaUsers, FaClock } from "react-icons/fa";
 
-// Sample initial data matching MongoDB Facilities Collection Schema
-const sampleFacilities = [
-  {
-    _id: "1",
-    name: "Green Arena Football Turf",
-    facility_type: "Football",
-    location: "Dhanmondi, Dhaka",
-    price_per_hour: 2500,
-    capacity: 14,
-    image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    _id: "2",
-    name: "Smash Badminton Academy",
-    facility_type: "Badminton",
-    location: "Gulshan, Dhaka",
-    price_per_hour: 1200,
-    capacity: 4,
-    image: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    _id: "3",
-    name: "Aqua Blue Swimming Pool",
-    facility_type: "Swimming",
-    location: "Uttara, Dhaka",
-    price_per_hour: 800,
-    capacity: 10,
-    image: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    _id: "4",
-    name: "Crown Tennis Court",
-    facility_type: "Tennis",
-    location: "Banani, Dhaka",
-    price_per_hour: 1800,
-    capacity: 4,
-    image: "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    _id: "5",
-    name: "PowerPlay Indoor Cricket Turf",
-    facility_type: "Cricket",
-    location: "Mirpur, Dhaka",
-    price_per_hour: 2000,
-    capacity: 12,
-    image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?auto=format&fit=crop&q=80&w=600",
-  },
-  {
-    _id: "6",
-    name: "Velocity Basketball Court",
-    facility_type: "Basketball",
-    location: "Bashundhara, Dhaka",
-    price_per_hour: 1500,
-    capacity: 10,
-    image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&q=80&w=600",
-  },
-];
+const FeaturedFacilities = () => {
+  const [facilities, setFacilities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-const FeaturedFacilities = ({ facilities = sampleFacilities }) => {
+  // ব্যাকএন্ড API থেকে ডাটা ফেচ
+  useEffect(() => {
+    fetch("http://localhost:5000/facilities")
+      .then((res) => res.json())
+      .then((data) => {
+        setFacilities(data);
+        setLoading(false);
+      })
+      .catch((err) => console.error("Fetch error:", err));
+  }, []);
+
+  if (loading) {
+    return <div className="text-center py-16 text-[#065F46] font-bold">Loading Top Facilities...</div>;
+  }
+
   return (
     <section className="py-16 bg-gray-50/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
