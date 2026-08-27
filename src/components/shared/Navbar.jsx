@@ -59,6 +59,18 @@ const Navbar = ({ isLoggedIn = false, user = null, handleLogout }) => {
                     My Bookings
                 </Link>
             </li>
+            <li>
+                <Link
+                    href="/manage-facilities"
+                    className={
+                        isActive("/manage-facilities")
+                            ? "text-[#065F46] font-bold underline underline-offset-4"
+                            : "text-gray-700 hover:text-[#065F46]"
+                    }
+                >
+                   Manage Facilities
+                </Link>
+            </li>
         </>
     );
 

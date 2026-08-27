@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FaUser, FaEnvelope, FaImage, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { authClient } from "@/lib/auth-client";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,10 +23,7 @@ export default function RegisterPage() {
     const photoURL = form.photoURL.value;
     const password = form.password.value;
 
-    // Assignment Specific Password Validation Rules:
-    // 1. Minimum 6 characters
-    // 2. At least one uppercase letter
-    // 3. At least one lowercase letter
+    // Password Validation Rules
     if (password.length < 6) {
       setError("Password must be at least 6 characters long.");
       return;
@@ -42,10 +40,19 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // TODO: রেজিস্ট্রেশন সাকসেস হলে অ্যাসাইনমেন্টের নিয়ম অনুযায়ী Login পেজে রিডাইরেক্ট হবে
-      console.log({ name, email, photoURL, password });
-      
-      router.push("/login");
+      const res = await authClient.signUp.email({
+        email,
+        password,
+        name,
+        image: photoURL,
+      });
+
+      if (res?.error) {
+        setError(res.error.message || "Registration failed. Try again.");
+      } else {
+        alert("Registration Successful!");
+        router.push("/login");
+      }
     } catch (err) {
       setError(err?.message || "Registration failed. Try again.");
     } finally {
@@ -54,9 +61,14 @@ export default function RegisterPage() {
   };
 
   const handleGoogleLogin = async () => {
+    setError("");
     try {
-      console.log("Google Login Triggered");
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
     } catch (err) {
+      console.error("Google Auth Error:", err);
       setError("Google sign-in failed.");
     }
   };
@@ -165,9 +177,9 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn bg-[#065F46] hover:bg-[#044e39] text-white border-none rounded-xl py-3 font-semibold text-sm shadow-md transition-all mt-2"
+            className="w-full btn bg-[#065F46] hover:bg-[#044e39] text-white border-none rounded-xl py-3 font-semibold text-sm shadow-md transition-all mt-2 disabled:opacity-50"
           >
-            {loading ? <span className="loading loading-spinner loading-sm"></span> : "Register"}
+            {loading ? "Registering..." : "Register"}
           </button>
         </form>
 
