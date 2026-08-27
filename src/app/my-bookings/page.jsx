@@ -108,12 +108,12 @@ export default function MyBookingsPage() {
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-900">My Bookings</h1>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            <h1 className="text-2xl sm:text-2xl font-black text-gray-900">My Bookings</h1>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1 mr-2">
               Manage and view all your reserved sports venues & slots.
             </p>
           </div>
-          <span className="bg-[#065F46]/10 text-[#065F46] font-bold text-xs sm:text-sm px-4 py-2 rounded-full">
+          <span className="bg-[#065F46]/10 text-[#065F46] font-bold text-xs sm:text-xs sm:px-2 sm:py-1 px-4 py-2 rounded-full">
             Total Bookings: {bookings.length}
           </span>
         </div>

@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🏟️ VenueX – Sports Facility Booking Platform
 
-## Getting Started
+## 📌 Project Purpose
+VenueX is a full‑stack booking system where users can discover sports facilities (football turfs, badminton courts, swimming lanes, tennis courts, etc.) and book them for specific dates and time slots. Authenticated users can also add and manage their own facilities, view their bookings, and cancel them – all in one place.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🌐 Live URL
+[https://venuex-sports.vercel.app/](https://venuex-sports.vercel.app/)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## ✨ Key Features
+- 🔐 **Authentication** – Login/Register with email/password and Google OAuth (secured with Better Auth and HTTP‑only cookies)
+- 🏸 **Facility CRUD** – Add, view, update, and delete facilities (only owners can manage their own)
+- 📅 **Booking System** – Book a facility, see total price, view all personal bookings, and cancel pending bookings
+- 🔍 **Search & Filter** – Search by facility name (regex) and filter by sport type
+- 📱 **Fully Responsive** – Optimized for mobile, tablet, and desktop
+- 🧩 **Extra Sections** – Custom hero banner, featured facilities (6+ cards from DB), and two creative static sections
+- ⚡ **Private Routes** – Protected pages with redirect for unauthenticated users
+- 🛠️ **User-Friendly UI** – Clean, modern design with DaisyUI components and Tailwind CSS
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 📦 NPM Packages Used
 
-To learn more about Next.js, take a look at the following resources:
+### Dependencies
+- `@better-auth/mongo-adapter` – MongoDB adapter for Better Auth  
+- `@heroui/react` – UI component library  
+- `better-auth` – Authentication library (with cookie support)  
+- `daisyui` – Tailwind CSS component library  
+- `mongodb` – MongoDB Node.js driver  
+- `next` – React framework (version 16)  
+- `react`, `react-dom` – Core React libraries  
+- `react-hot-toast` – Toast notifications  
+- `react-icons` – Icon set  
+- `sweetalert2` – Custom alerts and confirm dialogs  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Dev Dependencies
+- `@gravity-ui/icons` – Additional icons  
+- `@tailwindcss/postcss` – Tailwind CSS PostCSS plugin   
+- `tailwindcss` – Utility-first CSS framework  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠️ Tech Stack
+- **Frontend**: Next.js, React, Tailwind CSS, DaisyUI, HeroUI  
+- **Backend**: Next.js API routes (or Node.js + Express) with Better Auth  
+- **Database**: MongoDB (with `mongodb` driver and adapter)  
+- **Deployment**: Vercel (frontend & backend)  
