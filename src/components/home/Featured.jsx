@@ -95,7 +95,7 @@ const FeaturedFacilities = () => {
                   </div>
 
                   <Link
-                    href={`/facility/${item._id}`}
+                    href={`/facilities/${item._id}`}
                     className="btn bg-[#065F46] hover:bg-[#044e39] text-white border-none btn-sm rounded-lg font-semibold px-4 shadow-sm"
                   >
                     Book Now
