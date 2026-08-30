@@ -2,7 +2,6 @@ import FeaturedFacilities from "@/components/home/Featured";
 import Hero from "@/components/home/Hero";
 import HowItWorks from "@/components/home/HowItWorks";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
-import Image from "next/image";
 
 export default function Home() {
   return (

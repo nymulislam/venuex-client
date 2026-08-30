@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
@@ -13,6 +13,9 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/";
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -35,7 +38,7 @@ export default function LoginPage() {
         toast.error(errorMsg);
       } else {
         toast.success("Login Successful!");
-        router.push("/");
+        router.push(redirectTo);
       }
     } catch (err) {
       const errorMsg = err?.message || "Login failed. Please try again.";
@@ -51,7 +54,7 @@ export default function LoginPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: redirectTo,
       });
     } catch (err) {
       console.error("Google Auth Error:", err);

@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Swal from "sweetalert2";
 import { FaMapMarkerAlt, FaUsers, FaClock, FaArrowLeft, FaTimes } from "react-icons/fa";
-import { authClient } from "@/lib/auth-client"; // আপনার প্রজেক্টের পাথ অনুযায়ী ঠিক করে নিন
+import { authClient } from "@/lib/auth-client";
 
 export default function FacilityDetailsPage() {
   const { id } = useParams();
@@ -59,7 +59,6 @@ export default function FacilityDetailsPage() {
       return;
     }
 
-    // সেশন থেকে শুধুমাত্র ইমেইল অটো-সেট করা হলো (নাম খালি রাখা হয়েছে যাতে ইউজার নিজে টাইপ করতে পারে)
     setFormData((prev) => ({
       ...prev,
       userEmail: session.user.email || "",
