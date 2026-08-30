@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
@@ -17,6 +17,10 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
 
+  useEffect(()=> {
+    console.log("Redirect to:", redirectTo);
+  }, [redirectTo])
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -32,6 +36,8 @@ export default function LoginPage() {
         password,
       });
 
+      console.log("Login Response", res);
+      
       if (res?.error) {
         const errorMsg = res.error.message || "Invalid credentials. Please try again.";
         setError(errorMsg);
