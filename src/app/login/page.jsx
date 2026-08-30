@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
@@ -12,14 +12,9 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
-
-  useEffect(()=> {
-    console.log("Redirect to:", redirectTo);
-  }, [redirectTo])
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -36,8 +31,6 @@ export default function LoginPage() {
         password,
         callbackURL: redirectTo,
       });
-
-      console.log("Login Response", res);
 
       if (res?.error) {
         const errorMsg = res.error.message || "Invalid credentials. Please try again.";
