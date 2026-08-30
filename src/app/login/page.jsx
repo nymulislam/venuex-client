@@ -34,17 +34,17 @@ export default function LoginPage() {
       const res = await authClient.signIn.email({
         email,
         password,
+        callbackURL: redirectTo,
       });
 
       console.log("Login Response", res);
-      
+
       if (res?.error) {
         const errorMsg = res.error.message || "Invalid credentials. Please try again.";
         setError(errorMsg);
         toast.error(errorMsg);
       } else {
         toast.success("Login Successful!");
-        router.push(redirectTo);
       }
     } catch (err) {
       const errorMsg = err?.message || "Login failed. Please try again.";
