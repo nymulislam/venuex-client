@@ -10,7 +10,7 @@ const FeaturedFacilities = () => {
 
   // ব্যাকএন্ড API থেকে ডাটা ফেচ
   useEffect(() => {
-    fetch("http://localhost:5000/facilities")
+    fetch("https://venuex-server.vercel.app/facilities")
       .then((res) => res.json())
       .then((data) => {
         setFacilities(data);
